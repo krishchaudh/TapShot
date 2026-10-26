@@ -2,7 +2,7 @@
 
 [![Build](https://github.com/krishchaudh/TapShot/actions/workflows/build.yml/badge.svg)](https://github.com/krishchaudh/TapShot/actions/workflows/build.yml)
 [![Release](https://img.shields.io/github/v/release/krishchaudh/TapShot)](https://github.com/krishchaudh/TapShot/releases/latest)
-![macOS](https://img.shields.io/badge/macOS-12%2B-black)
+![macOS](https://img.shields.io/badge/macOS-10.13%2B-black)
 [![License: GPL-3.0](https://img.shields.io/badge/license-GPL--3.0-blue)](./LICENSE)
 
 **Click the trackpad with three fingers → the macOS screenshot crosshair (⌘⇧4) appears.**

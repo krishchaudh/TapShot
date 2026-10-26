@@ -125,10 +125,7 @@ import MultitouchSupport
 
     // get the current pointer location
     let location = CGEvent(source: nil)?.location ?? .zero
-    let buttonType: CGMouseButton = .center
-
-    postMouseEvent(type: .otherMouseDown, button: buttonType, location: location)
-    postMouseEvent(type: .otherMouseUp, button: buttonType, location: location)
+    TriggerAction.current.perform(at: location)
   }
 
   private func shouldPreventEmulation() -> Bool {
@@ -136,15 +133,6 @@ import MultitouchSupport
 
     let elapsedTimeSinceNatural = -naturalLastTime.timeIntervalSinceNow
     return elapsedTimeSinceNatural <= Self.maxTimeDelta * 0.75 // fine-tuned multiplier
-  }
-
-  private static func postMouseEvent(
-    type: CGEventType, button: CGMouseButton, location: CGPoint
-  ) {
-    CGEvent(
-      mouseEventSource: nil, mouseType: type, mouseCursorPosition: location,
-      mouseButton: button
-    )?.post(tap: .cghidEventTap)
   }
 
   private var currentDeviceList: [MTDevice] = []

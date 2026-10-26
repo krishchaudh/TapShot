@@ -11,7 +11,7 @@ BUILD_STAMP := ./build/.build-stamp
 
 # Only build if sources changed since last build
 $(BUILD_STAMP): $(SOURCES)
-	@echo "🔨 Building MiddleClick (Debug)..."
+	@echo "🔨 Building TapShot (Debug)..."
 	@xcodebuild -project MiddleClick.xcodeproj -scheme MiddleClick -configuration Debug build | grep -E "BUILD (SUCCEEDED|FAILED)|error:" || true
 	@echo "✅ Build succeeded!"
 	@mkdir -p $(dir $(BUILD_STAMP))
@@ -20,7 +20,7 @@ $(BUILD_STAMP): $(SOURCES)
 build-debug: $(BUILD_STAMP)
 
 run: $(BUILD_STAMP)
-	@echo "🚀 Running MiddleClick..."
+	@echo "🚀 Running TapShot..."
 	@BUILD_SKIP=1 ./scripts/build-and-run.sh
 
 force-build:
@@ -43,8 +43,8 @@ export:
 
 compress:
 	cd ./build && \
-	rm -f ./MiddleClick.zip && \
-	zip -r9 ./MiddleClick.zip ./MiddleClick.app
+	rm -f ./TapShot.zip && \
+	zip -r9 ./TapShot.zip ./TapShot.app
 
 create-cert:
 	security export -k ~/Library/Keychains/login.keychain-db -t identities -f pkcs12 | base64 | pbcopy

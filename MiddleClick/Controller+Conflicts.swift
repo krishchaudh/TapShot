@@ -22,19 +22,19 @@ extension Controller {
       let alert = AppUtils.warningAlert(
         title: "Conflicting gesture\(both ? "s" : "")",
         message: """
-Some optional gestures on your Mac won't work properly with MiddleClick.
-Turn them off in System Settings, change MiddleClick's "fingers" setting to 4, or apply the workarounds below:
+Some optional gestures on your Mac won't work properly with TapShot.
+Turn them off in System Settings, change TapShot's "fingers" setting to 4, or apply the workarounds below:
 \(threeFingerDragConflict ? """
 
 Dragging style: "Three Finger Drag"
 Issue — won't function, also adds an unintended left click to any middle click.
-Workarounds — Opt in for another Dragging style, or Choose to 'Ignore Finder' in the status menu of MiddleClick.
+Workarounds — Opt in for another Dragging style, or Choose to 'Ignore Finder' in the status menu of TapShot.
 """ : "")
 \(threeFingerTapConflict ? """
 
 Look up & data detectors: "Tap with Three Fingers"
-Issue — will fire simultaneously with MiddleClick.
-Workarounds — Disable 'Tap to click' in the status menu of MiddleClick.
+Issue — will fire simultaneously with TapShot.
+Workarounds — Disable 'Tap to click' in the status menu of TapShot.
 """ : "")
 """
       )

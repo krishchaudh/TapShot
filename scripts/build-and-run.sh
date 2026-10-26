@@ -1,13 +1,13 @@
 #!/bin/bash
 
-# MiddleClick - Build and Run Script
+# TapShot - Build and Run Script
 # Builds the project in Debug mode and runs it without opening Xcode
 
 set -e  # Exit on error
 
 # Build only if BUILD_SKIP is not set (allows Makefile to skip redundant builds)
 if [ -z "$BUILD_SKIP" ]; then
-  echo "🔨 Building MiddleClick (Debug)..."
+  echo "🔨 Building TapShot (Debug)..."
   xcodebuild -project MiddleClick.xcodeproj \
     -scheme MiddleClick \
     -configuration Debug \
@@ -23,16 +23,16 @@ if [ -z "$BUILD_SKIP" ]; then
 fi
 
 # Kill any existing MiddleClick instance
-echo "🔄 Stopping any running MiddleClick instances..."
-pkill -x MiddleClick 2>/dev/null || true
+echo "🔄 Stopping any running TapShot instances..."
+pkill -x TapShot 2>/dev/null || true
 sleep 0.5
 
 # Run the newly built app
-echo "🚀 Starting MiddleClick..."
+echo "🚀 Starting TapShot..."
 
 # Ask Xcode where it put the .app (canonical — no find, no mtime guessing)
 BUILT_PRODUCTS_DIR=$(xcodebuild -project MiddleClick.xcodeproj -scheme MiddleClick -configuration Debug -showBuildSettings 2>/dev/null | awk -F ' = ' '/ BUILT_PRODUCTS_DIR =/ {print $2}')
-BUILD_PATH="$BUILT_PRODUCTS_DIR/MiddleClick.app"
+BUILD_PATH="$BUILT_PRODUCTS_DIR/TapShot.app"
 
 # If the .app is missing at the canonical path, something's off.
 if [ ! -d "$BUILD_PATH" ]; then

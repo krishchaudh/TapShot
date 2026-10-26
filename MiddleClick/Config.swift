@@ -19,4 +19,7 @@ final class Config: ConfigCore {
   @UserDefault var tapToClick = SystemPermissions.getIsSystemTapToClickEnabled
 
   @UserDefault var ignoredAppBundles = Set<String>()
+
+  /// Raw value of `TriggerAction`
+  @UserDefault var action = TriggerAction.screenshot.rawValue
 }

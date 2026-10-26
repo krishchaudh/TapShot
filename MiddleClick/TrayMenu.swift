@@ -4,6 +4,7 @@ import AppKit
 @MainActor final class TrayMenu: NSObject {
   private let config = Config.shared
   private var infoItem, tapToClickItem, accessibilityPermissionStatusItem, accessibilityPermissionActionItem, ignoredAppItem, launchAtLoginItem: NSMenuItem!
+  private var actionItems: [TriggerAction: NSMenuItem] = [:]
   private var fingerCountControl: FingerCountControl!
   private let statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
   var isStatusItemVisible: Bool {
@@ -49,6 +50,14 @@ import AppKit
 
     infoItem.title = clickModeInfo + fingersInfo
     tapToClickItem.state = tapToClick ? .on : .off
+    updateActionItems()
+  }
+
+  private func updateActionItems() {
+    let current = TriggerAction.current
+    for (action, item) in actionItems {
+      item.state = action == current ? .on : .off
+    }
   }
 
   private func createMenu() -> NSMenu {
@@ -66,6 +75,15 @@ import AppKit
     menu.addSeparator()
 
     infoItem = menu.addItem(withTitle: "")
+
+    for action in TriggerAction.allCases {
+      let item = menu.addItem(
+        withTitle: action.title, action: #selector(selectAction), target: self)
+      item.representedObject = action.rawValue
+      item.indentationLevel = 1
+      actionItems[action] = item
+    }
+    menu.addSeparator()
 
     tapToClickItem = menu.addItem(
       withTitle: "Tap to click", action: #selector(toggleTapToClick), target: self)
@@ -102,16 +120,6 @@ import AppKit
       keyEquivalent: "r"
     )
     #endif
-
-    menu.addSeparator()
-
-    _ = menu.addItem(
-      withTitle: "What's next for MiddleClick", action: #selector(openSuccessor), target: self)
-
-    if Date() < Self.offerEnds {
-      _ = menu.addItem(
-        withTitle: "Get WheelClick — 20% off", action: #selector(openOffer), target: self)
-    }
 
     menu.addSeparator()
 
@@ -176,27 +184,17 @@ extension TrayMenu {
 
 // MARK: Actions
 extension TrayMenu {
-  private static let offerEnds = DateComponents(
-    calendar: .current, year: 2026, month: 10, day: 1).date ?? .distantPast
-
   @objc private func openWebsite() {
-    if let url = URL(string: "https://github.com/artginzburg/MiddleClick") {
+    if let url = URL(string: "https://github.com/krishchaudh/TapShot") {
       NSWorkspace.shared.open(url)
     }
   }
 
-  @objc private func openSuccessor() {
-    if let url = URL(string: "https://github.com/artginzburg/MiddleClick/issues/174") {
-      NSWorkspace.shared.open(url)
-    }
-  }
-
-  @objc private func openOffer() {
-    if let url = URL(
-      string: "https://buy.polar.sh/polar_cl_5jbgEF8UuZJchbcK2aoumIC89lIMZXZMqbtSG28xpUG"
-        + "?utm_source=middleclick&utm_medium=app&utm_campaign=byemiddleclick") {
-      NSWorkspace.shared.open(url)
-    }
+  @objc private func selectAction(sender: NSMenuItem) {
+    guard let raw = sender.representedObject as? String,
+          let action = TriggerAction(rawValue: raw) else { return }
+    TriggerAction.current = action
+    updateActionItems()
   }
 
   @objc private func openAccessibilitySettings() {

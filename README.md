@@ -1,152 +1,56 @@
-<a href="https://github.com/artginzburg/MiddleClick/releases">
-  <img align="right" src="https://img.shields.io/github/downloads/artginzburg/MiddleClick/total?color=teal" title="GitHub All Releases">
-</a>
+# TapShot
 
-<div align="center">
-  <h1>
-    MiddleClick <img align="center" height="80" src="MiddleClick/Images.xcassets/AppIcon.appiconset/icon_128p.png">
-  </h1>
-  <p>
-    <b>Emulate a scroll wheel click with three finger Click or Tap on MacBook trackpad and Magic Mouse</b>
-  </p>
-  <p>
-    with <b>macOS</b> Sequoia<a href="https://www.apple.com/macos/macos-sequoia/"><sup>15</sup></a> support!
-  </p>
-  <br>
-</div>
+**Click or tap the trackpad with three fingers → the macOS screenshot crosshair (⌘⇧4) appears.**
 
-> [!NOTE]
-> ## 🏁 MiddleClick is finished
->
-> It stays here, free and GPL-3.0, and `brew install --cask middleclick` keeps working. Nothing
-> removed, no nags, no telemetry.
->
-> The middle click it gave you — three-finger click and three-finger tap — is **free forever in
-> [WheelClick](https://wheelclick.app/?ref=middleclick-readme)**, its from-scratch successor, built
-> on the documented, supported part of macOS.
->
-> [The full story →](https://github.com/artginzburg/MiddleClick/issues/174)
-<br>
+Works on MacBook trackpads and the Magic Trackpad. Lives in the menu bar, no window.
 
-<img src="demo.png" width="55%">
-
-<h2 align="right">:mag: Usage</h2>
-
-<blockquote align="right">
-
-It's more than just `⌘`+click
-
-</blockquote>
-
-<p align="right">
-
-`System-wide` · close tabs by middleclicking on them
-
-</p>
-
-<p align="right">
-
-`In Safari` · middleclicking on a link opens it in the background as a new tab
-
-</p>
-
-<p align="right">
-
-`In Terminal` · paste selected text
-
-</p>
-
-<br>
+TapShot is a fork of [MiddleClick](https://github.com/artginzburg/MiddleClick) by Arthur Ginzburg
+(GPL-3.0). MiddleClick already did the hard part — reading finger count from the trackpad through
+Apple's private `MultitouchSupport` framework — so TapShot only swaps what happens when the gesture
+fires: instead of faking a scroll-wheel click it presses ⌘⇧4 for you. The original middle-click
+behaviour is still there as an option in the menu.
 
 ## Install
 
-### Via :beer: [Homebrew](https://brew.sh) (Recommended)
+1. Download `TapShot.zip` from the [latest release](https://github.com/krishchaudh/TapShot/releases/latest)
+   and unzip it.
+2. Drag `TapShot.app` into `/Applications`.
+3. The app is not notarized (no paid Apple developer account), so macOS will refuse to open it the first time.
+   Either:
+   - open **Terminal** and run `xattr -dr com.apple.quarantine /Applications/TapShot.app`, then open the app, or
+   - open the app, dismiss the warning, then go to **System Settings → Privacy & Security**, scroll down and click **Open Anyway**.
+4. When asked, give TapShot **Accessibility** permission
+   (System Settings → Privacy & Security → Accessibility → turn on TapShot). It needs this to see clicks and to press ⌘⇧4.
+5. Click the trackpad with three fingers. Crosshair.
 
-```ps1
-brew install --cask middleclick
-```
+Tick **Launch at login** in the menu-bar icon so it's always on.
 
-> Check out [the cask](https://github.com/Homebrew/homebrew-cask/blob/master/Casks/m/middleclick.rb) if you're interested
+### Tips
 
-### <a href="https://github.com/artginzburg/MiddleClick/releases/latest/download/MiddleClick.zip">Direct Download · <img align="center" alt="GitHub release" src="https://img.shields.io/github/release/artginzburg/MiddleClick?label=%20&color=gray"></a>
+- Three-finger *tap* (no physical click) also works if "Tap to click" is on in System Settings.
+  If **Look up & data detectors** is set to "Tap with Three Fingers" in Trackpad settings, turn it off or
+  the dictionary popup will fire too.
+- If you use **Three Finger Drag**, change TapShot's finger count to 4 (menu → Advanced) or turn the drag off.
+- Menu → **Middle click** switches back to the original MiddleClick behaviour.
 
-If you've used v1 or v2 — glance over [How to migrate](./docs/MIGRATIONS.md).
+## Build it yourself
 
-<br>
+Open `MiddleClick.xcodeproj` in Xcode and press Run — it's set to "Sign to Run Locally", nothing to configure.
+Or from Terminal: `make run`.
 
-## Preferences
+Every push to `main` also builds the app on GitHub Actions; pushing a tag like `v1.0.0` publishes a release with `TapShot.zip`.
 
-### Hide Status Bar Item
+## How it works (the short version)
 
-> This is a native macOS feature — works the same for any app.
+- `MoreTouch/` — Swift wrapper around the private `MultitouchSupport.framework`; delivers per-finger
+  touch frames.
+- `MiddleClick/TouchHandler.swift` — decides whether the current touches are a "three-finger tap"
+  (fingers down ≤ 300 ms, barely moved).
+- `MiddleClick/Controller+Mouse.swift` — a `CGEventTap` on mouse buttons; if three fingers are resting on
+  the trackpad when a physical click arrives, the click is swallowed and the action fires instead.
+- `MiddleClick/TriggerAction.swift` — the action itself. For screenshots it posts ⌘ down, ⇧ down,
+  `4` down/up, ⇧ up, ⌘ up as `CGEvent`s, which macOS treats like a real keyboard press.
 
-1. Hold `⌘` and drag the icon away from the menu bar until you see :heavy_multiplication_x:
-2. Release
+## License
 
-To bring it back — just open MiddleClick again while it's already running.
-
-### Number of Fingers
-
-- Want to use 4, 5 or 2 fingers for middleclicking? No trouble. Even 10 is possible.
-- **Note:** setting `fingers` to `2` will conflict with normal two-finger right-clicks and single-finger clicks.
-
-```ps1
-defaults write art.ginzburg.MiddleClick fingers 4
-```
-
-> Default is 3
-
-### Allow to click with more than the defined number of fingers.
-
-- This is useful if your second hand accidentally touches the touchpad.
-- Unfortunately, this does not serve as a palm rejection technique for huge touchpads.
-
-```ps1
-defaults write art.ginzburg.MiddleClick allowMoreFingers true
-```
-
-> Default is false, so that the number of fingers is precise
-
-### Tapping preferences
-
-#### Max Distance Delta
-
-- The maximum distance the cursor can travel between touch and release for a tap to be considered valid.
-- The position is normalized and values go from 0 to 1.
-
-```ps1
-defaults write art.ginzburg.MiddleClick maxDistanceDelta 0.03
-```
-
-> Default is 0.05
-
-#### Max Time Delta
-
-- The maximum interval in milliseconds between touch and release for a tap to be considered valid.
-
-```ps1
-defaults write art.ginzburg.MiddleClick maxTimeDelta 150
-```
-
-> Default is 300
-
-## Troubleshooting
-
-- [Accessibility permissions not working after an update](./docs/troubleshooting.md#accessibility-permissions-not-working-after-an-update)
-- [Antivirus / CleanMyMac false positive](./docs/troubleshooting.md#antivirus--cleanmymac-flags-middleclick-as-adware)
-- [Three Finger Drag conflicts](./docs/three-finger-drag.md)
-
-## Building from source
-
-> Assuming you have `Command Line Tools` installed
-
-1. Clone the repo
-2. Run `make`
-3. You'll get a `MiddleClick.app` in `./build/`
-
-## Credits
-
-Created by [Clément Beffa](https://clement.beffa.org/),<br/>
-fixed by [Alex Galonsky](https://github.com/galonsky) and [Carlos E. Hernandez](https://github.com/carlosh),<br/>
-revived by [Pascâl Hartmann](https://github.com/LoPablo),<br/>
-maintained by [Arthur Ginzburg](https://github.com/artginzburg)
+GPL-3.0, same as MiddleClick. See [LICENSE](./LICENSE).

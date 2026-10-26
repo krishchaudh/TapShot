@@ -1,0 +1,48 @@
+name: Build TapShot
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build (Release, signed to run locally)
+        run: |
+          xcodebuild -project MiddleClick.xcodeproj \
+            -scheme MiddleClick \
+            -configuration Release \
+            -derivedDataPath build/DerivedData \
+            CODE_SIGN_IDENTITY="-" CODE_SIGN_STYLE=Automatic DEVELOPMENT_TEAM="" \
+            build
+
+      - name: Zip the app
+        run: |
+          mkdir -p build/out
+          ditto -c -k --keepParent build/DerivedData/Build/Products/Release/TapShot.app build/out/TapShot.zip
+          ls -la build/out
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: TapShot
+          path: build/out/TapShot.zip
+
+      - name: Attach to GitHub release
+        if: startsWith(github.ref, 'refs/tags/v')
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create "${GITHUB_REF_NAME}" build/out/TapShot.zip \
+            --repo "${GITHUB_REPOSITORY}" \
+            --title "TapShot ${GITHUB_REF_NAME}" \
+            --notes "Three-finger click or tap on the trackpad → screenshot crosshair (⌘⇧4). See README for install steps." \
+            || gh release upload "${GITHUB_REF_NAME}" build/out/TapShot.zip --clobber --repo "${GITHUB_REPOSITORY}"

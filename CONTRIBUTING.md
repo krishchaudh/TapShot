@@ -1,6 +1,6 @@
-# Contributing to MiddleClick
+# Contributing to TapShot
 
-Thanks for your interest in contributing! This project is maintained in spare time, so community help is genuinely appreciated.
+TapShot is a small fork of [MiddleClick](https://github.com/artginzburg/MiddleClick); gesture-detection fixes are best sent upstream, anything about the screenshot action or the menu belongs here.
 
 ## What's valued most
 
